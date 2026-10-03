@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dapur Kerajaan - Warung Santapan Petualang & Istana</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --pixel-border-color: #2b1704;
+            --parchment-bg: #f5e6c8;
+            --parchment-dark: #e1c89a;
+            --royal-gold: #f59e0b;
+            --wood-dark: #3e2723;
+            --wood-mid: #5d4037;
+        }
+
+        body {
+            font-family: 'MedievalSharp', cursive, serif;
+            image-rendering: pixelated;
+            user-select: none;
+        }
+
+        .font-pixel {
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        .font-retro {
+            font-family: 'VT323', monospace;
+        }
+
+        /* Pixel Borders Utility */
+        .pixel-box {
+            background-color: var(--parchment-bg);
+            border: 4px solid var(--pixel-border-color);
+            box-shadow: 
+                inset -3px -3px 0px 0px #b89758,
+                inset 3px 3px 0px 0px #fff7db,
+                4px 4px 0px 0px rgba(0, 0, 0, 0.4);
+        }
+
+        .pixel-box-dark {
+            background-color: #24160c;
+            border: 4px solid #100803;
+            box-shadow: 
+                inset -3px -3px 0px 0px #130a04,
+                inset 3px 3px 0px 0px #4d3319,
+                4px 4px 0px 0px rgba(0, 0, 0, 0.5);
+        }
+
+        .pixel-button {
+            border: 3px solid #1a0f07;
+            box-shadow: 
+                inset -2px -2px 0px 0px rgba(0, 0, 0, 0.35),
+                inset 2px 2px 0px 0px rgba(255, 255, 255, 0.4),
+                2px 2px 0px 0px #000;
+            transition: all 0.08s ease;
+        }
+
+        .pixel-button:active {
+            transform: translate(2px, 2px);
+            box-shadow: inset 2px 2px 0px 0px rgba(0,0,0,0.5);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2d1b0d;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8b5a2b;
+            border: 2px solid #1f1207;
+        }
+
+        /* Floating Animation */
+        @keyframes gentle-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        .anim-float {
+            animation: gentle-bounce 3s infinite ease-in-out;
+        }
+
+        /* Pixel art background styling using radial castle atmosphere fallback */
+        .scenery-bg {
+            background-color: #5d7e99;
+            background-image: 
+                linear-gradient(rgba(18, 12, 7, 0.72), rgba(28, 17, 9, 0.88)),
+                radial-gradient(circle at 50% 30%, rgba(245, 158, 11, 0.15) 0%, transparent 60%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 80 80'%3E%3Cg fill='%2338271a' fill-opacity='0.25'%3E%3Cpath d='M0 0h40v40H0V0zm40 40h40v40H40V40zm0-40h2v40h-2V0zm-40 40h40v2H0v-2z'/%3E%3C/g%3E%3C/svg%3E");
+            background-attachment: fixed;
+            background-size: cover;
+        }
+
+        /* Sparkle canvas overlay */
+        #fx-canvas {
+            pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body class="scenery-bg min-h-screen text-stone-900 flex flex-col justify-between overflow-x-hidden">
+    <canvas id="fx-canvas"></canvas>
+
+    <header class="sticky top-0 z-40 bg-[#1b1008]/95 border-b-4 border-[#3f2510] text-[#f4ecd8] px-4 py-2.5 shadow-lg backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- Store Branding -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-amber-600 rounded-sm border-2 border-amber-300 flex items-center justify-center text-amber-100 shadow-inner">
+                    <i class="fa-solid fa-crown text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-pixel text-xs sm:text-sm text-amber-400 tracking-wider">DAPUR KERAJAAN</h1>
+                        <span class="text-[10px] bg-red-800 text-red-100 px-1.5 py-0.5 rounded font-pixel">KEDAI LV.3</span>
+                    </div>
+                    <p class="text-xs text-stone-400 hidden sm:block">Santapan Lezat Istana & Logistik Petualang</p>
+                </div>
+            </div>
+
+            <!-- Player Status Bar (RPG Stats) -->
+            <div class="flex items-center gap-3 sm:gap-6 bg-[#2a1a0d] px-3 py-1.5 border-2 border-[#492d16] rounded-sm">
+                <!-- Gold Balance -->
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-amber-400 border-2 border-amber-200 flex items-center justify-center text-amber-950 font-bold text-xs shadow">
+                        🪙
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-amber-300/80 font-pixel">KOIN EMAS</div>
+                        <span id="player-gold" class="font-pixel text-xs text-amber-300 font-bold">500</span>
+                        <span class="text-xs text-amber-500 font-bold">G</span>
+                    </div>
+                </div>
+
+                <!-- Stamina Bar -->
+                <div class="hidden md:flex flex-col gap-1 w-28">
+                    <div class="flex justify-between text-[9px] font-pixel text-emerald-400">
+                        <span>STAMINA</span>
+                        <span id="stamina-val">85/100</span>
+                    </div>
+                    <div class="w-full bg-stone-800 h-2.5 border border-stone-600 rounded-xs overflow-hidden">
+                        <div id="stamina-fill" class="bg-gradient-to-r from-emerald-600 to-green-400 h-full transition-all duration-300" style="width: 85%;"></div>
+                    </div>
+                </div>
+
+                <!-- Audio Toggle & Backpack Cart Button -->
+                <div class="flex items-center gap-2">
+                    <button id="btn-sound" onclick="toggleSound()" title="Aktifkan Musik/Efek Suara 8-Bit" class="pixel-button bg-stone-700 hover:bg-stone-600 text-stone-200 w-9 h-9 flex items-center justify-center rounded text-sm">
+                        <i id="sound-icon" class="fa-solid fa-volume-xmark"></i>
+                    </button>
+                    
+                    <button onclick="toggleBackpackModal()" class="pixel-button bg-amber-600 hover:bg-amber-500 text-amber-950 px-3 py-1.5 flex items-center gap-2 font-pixel text-xs rounded font-bold">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span class="hidden sm:inline">RANSEL</span>
+                        <span id="cart-counter" class="bg-red-700 text-white text-[10px] px-1.5 py-0.5 rounded-full">0</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-1">
+        
+        <!-- Welcome Hero Banner -->
+        <section class="pixel-box-dark text-[#e9ded0] p-4 sm:p-6 mb-8 rounded-sm relative overflow-hidden">
+            <div class="absolute -right-6 -bottom-6 text-9xl text-amber-500/10 pointer-events-none select-none">
+                <i class="fa-solid fa-utensils"></i>
+            </div>
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="space-y-2 text-center md:text-left">
+                    <div class="inline-block bg-amber-500/20 text-amber-300 text-xs px-2.5 py-1 border border-amber-500/50 rounded font-pixel">
+                        🏰 LOKASI: ALUN-ALUN BENTENG UTARA
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-bold font-pixel text-amber-400 tracking-wide">
+                        WARUNG MAKAN DAPUR KERAJAAN
+                    </h2>
+                    <p class="text-stone-300 text-sm sm:text-base max-w-2xl leading-relaxed">
+                        Dipanggang langsung di atas perapian kayu ek istana! Dapatkan pasokan ransel berkualitas tinggi untuk memulihkan <span class="text-emerald-400 font-bold">HP</span>, meningkatkan <span class="text-blue-400 font-bold">Mana</span>, serta stamina tempur sebelum menjelajah dungeon luar benteng.
+                    </p>
+                </div>
+
+                <!-- NPC Tavern Host Dialogue Widget -->
+                <div class="w-full md:w-80 pixel-box p-3 text-stone-900 flex items-start gap-3 bg-[#f3e5c9]">
+                    <div class="w-14 h-14 bg-amber-900 border-2 border-amber-950 flex-shrink-0 flex items-center justify-center text-3xl shadow">
+                        👨‍🍳
+                    </div>
+                    <div class="text-xs">
+                        <div class="font-pixel text-[10px] text-amber-900 font-bold mb-1">Koki Balthazar:</div>
+                        <p id="npc-text" class="italic text-stone-800">
+                            "Ayam panggang madu kami baru saja keluar dari oven! Ksatria istana memuji rasanya yang mantap!"
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <div class="flex flex-wrap gap-2" id="filter-container">
+                <button onclick="filterCategory('all')" class="filter-btn active pixel-button bg-amber-500 text-stone-950 px-3 py-1.5 text-xs font-pixel rounded">
+                    🍗 Semua Santapan
+                </button>
+                <button onclick="filterCategory('heavy')" class="filter-btn pixel-button bg-stone-800 text-stone-200 px-3 py-1.5 text-xs font-pixel rounded hover:bg-stone-700">
+                    🍖 Daging & Panggangan
+                </button>
+                <button onclick="filterCategory('bakery')" class="filter-btn pixel-button bg-stone-800 text-stone-200 px-3 py-1.5 text-xs font-pixel rounded hover:bg-stone-700">
+                    🥖 Roti & Pastry
+                </button>
+                <button onclick="filterCategory('soup')" class="filter-btn pixel-button bg-stone-800 text-stone-200 px-3 py-1.5 text-xs font-pixel rounded hover:bg-stone-700">
+                    🍲 Rebusan Kuali
+                </button>
+                <button onclick="filterCategory('drinks')" class="filter-btn pixel-button bg-stone-800 text-stone-200 px-3 py-1.5 text-xs font-pixel rounded hover:bg-stone-700">
+                    🍺 Minuman & Potion
+                </button>
+            </div>
+
+            <!-- Shop Sort & Search -->
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <div class="relative flex-1 sm:w-56">
+                    <input type="text" id="search-input" oninput="handleSearch()" placeholder="Cari santapan..." class="w-full bg-[#1e1309] border-2 border-[#54351a] text-stone-100 text-xs px-3 py-2 pl-8 font-retro text-base focus:outline-none focus:border-amber-400">
+                    <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-stone-400 text-xs"></i>
+                </div>
+            </div>
+        </div>
+
+        <div id="food-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <!-- Dynamically populated via JS -->
+        </div>
+
+        <!-- Empty Results Message -->
+        <div id="empty-state" class="hidden text-center py-16 pixel-box bg-[#f8ebcf] mt-4">
+            <div class="text-4xl mb-2">📜</div>
+            <h3 class="font-pixel text-base text-amber-900">Santapan Tidak Ditemukan!</h3>
+            <p class="text-xs text-stone-600 mt-1">Koki Balthazar belum menyiapkan resep untuk kata kunci ini.</p>
+        </div>
+
+        <section class="mt-12 pixel-box-dark p-5 rounded">
+            <div class="flex items-center gap-3 border-b border-stone-700 pb-3 mb-4">
+                <span class="text-2xl">📌</span>
+                <div>
+                    <h3 class="font-pixel text-sm text-amber-400">PAPAN PENGUMUMAN ALUN-ALUN ISTANA</h3>
+                    <p class="text-xs text-stone-400">Kabar burung & efek santapan untuk petualangan hari ini</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div class="bg-[#180d06] p-3 border border-amber-900/60 rounded">
+                    <div class="text-amber-400 font-bold mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-shield-halved text-amber-500"></i> Diskon Pengawal Kerajaan
+                    </div>
+                    <p class="text-stone-300">Setiap pembelian 3 porsi Roti Gandum Istana mendapatkan berkah ketahanan +5 DEF selama 1 jam.</p>
+                </div>
+                <div class="bg-[#180d06] p-3 border border-amber-900/60 rounded">
+                    <div class="text-amber-400 font-bold mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-dragon text-red-500"></i> Peringatan Naga Hutan Kabut
+                    </div>
+                    <p class="text-stone-300">Gunakan Rebusan Daging Rempah Naga untuk menahan racun dan hawa dingin di lembah jurang.</p>
+                </div>
+                <div class="bg-[#180d06] p-3 border border-amber-900/60 rounded">
+                    <div class="text-amber-400 font-bold mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-coins text-yellow-400"></i> Tukar Koin Gratis
+                    </div>
+                    <p class="text-stone-300">Kehabisan uang? Kunjungi pos penjaga atau tekan tombol "Misi Harian" untuk menambah koin emasmu!</p>
+                    <button onclick="claimDailyReward()" class="mt-2 text-[10px] font-pixel bg-amber-600 hover:bg-amber-500 text-stone-900 px-2 py-1 rounded">
+                        Klaim 100 G Hadiah Patroli
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-[#140b05] border-t-4 border-[#331c0a] text-stone-400 py-6 px-4 mt-12 text-center text-xs">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="text-amber-400 font-pixel text-xs">DAPUR KERAJAAN</span>
+                <span>• Pasar Makanan Kerajaan Edisi Pixel</span>
+            </div>
+            <div class="font-retro text-base text-stone-400">
+                Peringatan: Seluruh konsumsi makanan dijamin halal & bebas sihir kutukan gelap.
+            </div>
+            <div class="text-[11px] text-stone-500">
+                © Benteng Utama Kerajaan • Terbuka untuk seluruh ksatria & penyihir
+            </div>
+        </div>
+    </footer>
+
+    <div id="backpack-drawer" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden transition-opacity flex justify-end">
+        <div class="w-full max-w-md h-full bg-[#f6ebcf] border-l-4 border-[#311c0d] flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
+            
+            <!-- Drawer Header -->
+            <div class="bg-[#2a170a] text-amber-300 p-4 border-b-4 border-[#4d2f16] flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-box-archive text-amber-400 text-lg"></i>
+                    <div>
+                        <h3 class="font-pixel text-xs">RANSEL LOGISTIK</h3>
+                        <span class="text-[10px] text-stone-300">Bekal Perjalanan Petualang</span>
+                    </div>
+                </div>
+                <button onclick="toggleBackpackModal()" class="text-stone-300 hover:text-white text-lg px-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Cart Items List -->
+            <div id="cart-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+                <!-- Dynamically populated or empty -->
+            </div>
+
+            <!-- Drawer Checkout Summary -->
+            <div class="p-4 bg-[#ebd8b2] border-t-4 border-[#3a2210] space-y-3">
+                <div class="flex justify-between items-center text-xs font-pixel text-stone-800">
+                    <span>TOTAL LOGISTIK:</span>
+                    <span class="text-amber-800 text-sm font-bold"><span id="cart-total">0</span> G</span>
+                </div>
+                
+                <div class="text-[11px] text-stone-600 italic">
+                    * Santapan langsung dimasukkan ke inventory tas tanpa biaya porter istana.
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="clearBackpack()" class="pixel-button bg-stone-300 hover:bg-stone-400 text-stone-800 py-2.5 text-xs font-pixel rounded">
+                        KOSONGKAN
+                    </button>
+                    <button onclick="processPurchase()" class="pixel-button bg-amber-500 hover:bg-amber-400 text-amber-950 py-2.5 text-xs font-pixel font-bold rounded">
+                        BAYAR KOIN
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dialog-overlay" class="fixed inset-0 bg-black/75 z-50 hidden flex items-center justify-center p-4">
+        <div class="pixel-box max-w-md w-full p-5 bg-[#fbf3db] border-4 border-[#2b1704] relative">
+            <div class="flex items-start gap-4">
+                <div id="dialog-avatar" class="w-16 h-16 bg-amber-800 border-2 border-amber-950 flex-shrink-0 flex items-center justify-center text-3xl shadow">
+                    👨‍🍳
+                </div>
+                <div class="flex-1">
+                    <h4 id="dialog-title" class="font-pixel text-xs text-amber-900 font-bold mb-1">Koki Balthazar</h4>
+                    <p id="dialog-message" class="text-sm text-stone-800 leading-relaxed font-retro text-lg">
+                        "Terima kasih pengelana! Santapan hangat ini sudah dikemas rapi. Semoga perjalananmu aman dan terhindar dari monster buas!"
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-3 border-t-2 border-stone-300 flex justify-end">
+                <button onclick="closeDialog()" class="pixel-button bg-amber-600 hover:bg-amber-500 text-white px-4 py-1.5 text-xs font-pixel rounded">
+                    Lanjutkan [OK]
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Menu Dataset with authentic Medieval Tavern Barn theme
+        const FOOD_MENU = [
+            {
+                id: 1,
+                name: "Ayam Panggang Madu Istana",
+                category: "heavy",
+                price: 45,
+                icon: "🍗",
+                badge: "Terlaris",
+                stats: "+45 HP | +10 STR",
+                desc: "Ayam utuh dipanggang perlahan dengan saus madu hutan dan rempah kesturi kerajaan."
+            },
+            {
+                id: 2,
+                name: "Kalkun Panggang Raja",
+                category: "heavy",
+                price: 75,
+                icon: "🦃",
+                badge: "Pesta Kerajaan",
+                stats: "+80 HP | +15 DEF",
+                desc: "Porsi besar dengan kulit keemasan renyah disajikan saat perayaan kemenangan prajurit."
+            },
+            {
+                id: 3,
+                name: "Paha Daging Asap Hutan",
+                category: "heavy",
+                price: 50,
+                icon: "🍖",
+                badge: "Favorit Ksatria",
+                stats: "+60 HP | +5 ATK",
+                desc: "Daging paha asap tebal aroma kayu ek, awet tahan lama untuk penjelajahan berminggu-minggu."
+            },
+            {
+                id: 4,
+                name: "Roti Gandum Oven Batu",
+                category: "bakery",
+                price: 15,
+                icon: "🍞",
+                badge: "Makanan Pokok",
+                stats: "+20 HP | +15 STAMINA",
+                desc: "Roti gandum kasar tradisional dengan remah empuk, dibakar di perapian batu bata."
+            },
+            {
+                id: 5,
+                name: "Pai Daging Lembu & Sayur",
+                category: "bakery",
+                price: 35,
+                icon: "🥧",
+                badge: "Hangat",
+                stats: "+35 HP | +10 DEF",
+                desc: "Pai renyah isi potongan daging lembu empuk, wortel, dan kuah kental beraroma rempah."
+            },
+            {
+                id: 6,
+                name: "Tart Berry Manis Ratu",
+                category: "bakery",
+                price: 25,
+                icon: "🫐",
+                badge: "Kue Manis",
+                stats: "+25 HP | +30 MANA",
+                desc: "Kue tart mentega manis dengan selai buah berry liar dari lereng bukit kerajaan."
+            },
+            {
+                id: 7,
+                name: "Rebusan Kuali Daging Tavern",
+                category: "soup",
+                price: 40,
+                icon: "🍲",
+                badge: "Resep Kuno",
+                stats: "+50 HP | +20 REGEN",
+                desc: "Rebusan mendidih kental dalam kuali besi tempa, cocok disantap saat cuaca bersalju."
+            },
+            {
+                id: 8,
+                name: "Sup Pedas Cabe Naga",
+                category: "soup",
+                price: 38,
+                icon: "🥣",
+                badge: "Penghangat Tubuh",
+                stats: "+40 HP | +15 FIRE RES",
+                desc: "Kuah pedas membara yang langsung menyegarkan badan lelah dan menangkal demam rawa."
+            },
+            {
+                id: 9,
+                name: "Bir Jagung Tradisional (Mead)",
+                category: "drinks",
+                price: 20,
+                icon: "🍺",
+                badge: "Minuman Kedai",
+                stats: "+25 STAMINA | -5 AGI",
+                desc: "Minuman fermentasi madu dan jagung khas rakyat jelata bernutrisi tinggi dan memicu tawa."
+            },
+            {
+                id: 10,
+                name: "Teh Herbal Bunga Elven",
+                category: "drinks",
+                price: 28,
+                icon: "🍵",
+                badge: "Penyembuh",
+                stats: "+30 HP | +50 MANA",
+                desc: "Seduhan daun teh harum kiriman pedagang asing yang menenangkan jiwa dan memulihkan fokus."
+            },
+            {
+                id: 11,
+                name: "Elixir Stamina Merah Delima",
+                category: "drinks",
+                price: 60,
+                icon: "🍷",
+                badge: "Tonik Khusus",
+                stats: "+100 STAMINA",
+                desc: "Ekstrak buah delima ajaib istana untuk seketika memulihkan seluruh tenaga petualang."
+            },
+            {
+                id: 12,
+                name: "Keranjang Apel Kebun Raja",
+                category: "bakery",
+                price: 12,
+                icon: "🍎",
+                badge: "Segar",
+                stats: "+15 HP | +10 STAMINA",
+                desc: "Apel merah segar berair yang dipetik pagi ini dari perkebunan istana bagian selatan."
+            }
+        ];
+
+        // State Management
+        let playerGold = 500;
+        let cart = [];
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let soundEnabled = false;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playRetroSound(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (!audioCtx) return;
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'coin') {
+                    // Coin pickup arpeggio
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(987.77, now); // B5
+                    osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'buy') {
+                    // Success fanfare chord
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                } else if (type === 'error') {
+                    // Error buzz
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.setValueAtTime(100, now + 0.1);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'click') {
+                    // Simple retro blip
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                }
+            } catch (err) {
+                console.error("Audio error:", err);
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            initAudio();
+            const icon = document.getElementById('sound-icon');
+            const btn = document.getElementById('btn-sound');
+            if (soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high text-amber-400';
+                btn.classList.add('bg-stone-800');
+                playRetroSound('coin');
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark';
+                btn.classList.remove('bg-stone-800');
+            }
+        }
+
+        function renderMenu() {
+            const grid = document.getElementById('food-grid');
+            const empty = document.getElementById('empty-state');
+            grid.innerHTML = '';
+
+            const filtered = FOOD_MENU.filter(item => {
+                const matchesCategory = (currentFilter === 'all') || (item.category === currentFilter);
+                const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      item.desc.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            } else {
+                empty.classList.add('hidden');
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "pixel-box flex flex-col justify-between p-4 bg-[#f8ecd1] hover:scale-[1.01] transition-transform duration-150";
+                
+                card.innerHTML = `
+                    <div>
+                        <!-- Top Tag & Price -->
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="text-[10px] font-pixel bg-[#3d2311] text-amber-300 px-2 py-0.5 rounded">
+                                ${item.badge}
+                            </span>
+                            <div class="flex items-center gap-1 font-pixel text-xs text-amber-900 font-bold">
+                                <span>${item.price}</span>
+                                <span class="text-amber-600">G</span>
+                            </div>
+                        </div>
+
+                        <!-- Sprite Graphic Area -->
+                        <div class="bg-[#ebd7b0] border-2 border-[#b59a6d] rounded py-5 flex items-center justify-center my-2 shadow-inner">
+                            <span class="text-5xl transform hover:scale-110 transition-transform select-none drop-shadow">${item.icon}</span>
+                        </div>
+
+                        <!-- Title & Description -->
+                        <h4 class="font-bold text-base text-stone-900 leading-snug mt-2 font-pixel text-xs text-amber-950">${item.name}</h4>
+                        <p class="text-xs text-stone-700 mt-1 leading-relaxed">${item.desc}</p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t-2 border-[#cfb58c]">
+                        <!-- RPG Stat Bonus Tag -->
+                        <div class="bg-emerald-950/80 text-emerald-300 text-[10px] font-pixel px-2 py-1 rounded text-center mb-3 tracking-tight border border-emerald-700/50">
+                            ${item.stats}
+                        </div>
+
+                        <!-- Action Button -->
+                        <button onclick="addToCart(${item.id}, event)" class="w-full pixel-button bg-amber-500 hover:bg-amber-400 text-stone-950 font-pixel text-xs py-2 rounded flex items-center justify-center gap-2 font-bold">
+                            <i class="fa-solid fa-plus text-[10px]"></i> MASUKKAN RANSEL
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Filter and Search Handlers
+        function filterCategory(cat) {
+            playRetroSound('click');
+            currentFilter = cat;
+            
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-amber-500', 'text-stone-950', 'active');
+                btn.classList.add('bg-stone-800', 'text-stone-200');
+            });
+            event.currentTarget.classList.add('bg-amber-500', 'text-stone-950', 'active');
+            event.currentTarget.classList.remove('bg-stone-800', 'text-stone-200');
+
+            renderMenu();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('search-input').value.trim();
+            renderMenu();
+        }
+
+        function addToCart(itemId, ev) {
+            const item = FOOD_MENU.find(i => i.id === itemId);
+            if (!item) return;
+
+            const existing = cart.find(ci => ci.id === itemId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+
+            playRetroSound('coin');
+            spawnSparkles(ev.clientX, ev.clientY);
+            updateCartUI();
+
+            // Dynamic NPC reaction
+            const dialogues = [
+                `"Pilihan bagus! ${item.name} dibuat segar oleh tangan saya sendiri!"`,
+                `"${item.name} akan membuat stamina perjalananmu kembali membara!"`,
+                `"Ksatria benteng selalu membeli bekal ${item.name} sebelum berjaga!"`
+            ];
+            document.getElementById('npc-text').innerText = dialogues[Math.floor(Math.random() * dialogues.length)];
+        }
+
+        function updateCartUI() {
+            const counter = document.getElementById('cart-counter');
+            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            counter.innerText = totalCount;
+
+            const listContainer = document.getElementById('cart-list');
+            const totalEl = document.getElementById('cart-total');
+
+            if (cart.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="h-64 flex flex-col items-center justify-center text-center text-stone-500">
+                        <i class="fa-solid fa-backpack text-4xl mb-2 text-stone-400"></i>
+                        <p class="font-pixel text-xs text-stone-600">Ranselmu masih kosong!</p>
+                        <p class="text-xs text-stone-500 mt-1">Pilih santapan istana untuk perbekalan.</p>
+                    </div>
+                `;
+                totalEl.innerText = '0';
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            let grandTotal = 0;
+
+            cart.forEach(item => {
+                const subtotal = item.price * item.qty;
+                grandTotal += subtotal;
+
+                const itemRow = document.createElement('div');
+                itemRow.className = "pixel-box p-2.5 bg-[#fef8eb] flex items-center justify-between gap-3 text-xs";
+                itemRow.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">${item.icon}</span>
+                        <div>
+                            <h5 class="font-bold text-stone-900 font-pixel text-[11px]">${item.name}</h5>
+                            <span class="text-amber-800 font-bold">${item.price} G</span>
+                            <span class="text-stone-500 text-[10px]">x ${item.qty} = ${subtotal} G</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="modifyQty(${item.id}, -1)" class="pixel-button bg-stone-300 hover:bg-stone-400 w-6 h-6 flex items-center justify-center font-bold text-xs rounded">-</button>
+                        <span class="w-5 text-center font-bold font-pixel text-xs">${item.qty}</span>
+                        <button onclick="modifyQty(${item.id}, 1)" class="pixel-button bg-amber-500 hover:bg-amber-400 w-6 h-6 flex items-center justify-center font-bold text-xs rounded">+</button>
+                    </div>
+                `;
+                listContainer.appendChild(itemRow);
+            });
+
+            totalEl.innerText = grandTotal;
+        }
+
+        function modifyQty(id, change) {
+            playRetroSound('click');
+            const item = cart.find(ci => ci.id === id);
+            if (!item) return;
+
+            item.qty += change;
+            if (item.qty <= 0) {
+                cart = cart.filter(ci => ci.id !== id);
+            }
+            updateCartUI();
+        }
+
+        function clearBackpack() {
+            if (cart.length === 0) return;
+            playRetroSound('click');
+            cart = [];
+            updateCartUI();
+        }
+
+        function toggleBackpackModal() {
+            playRetroSound('click');
+            const drawer = document.getElementById('backpack-drawer');
+            drawer.classList.toggle('hidden');
+        }
+
+        function processPurchase() {
+            if (cart.length === 0) {
+                showDialog("Ransel Kosong", "Tas ranselmu belum diisi santapan apa pun, Pengelana! Pilihlah hidangan di kedai terlebih dahulu.", "⚠️");
+                playRetroSound('error');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            if (playerGold < total) {
+                playRetroSound('error');
+                showDialog(
+                    "Koin Tidak Mencukupi!", 
+                    `Total harga belanjaanmu adalah ${total} G, tetapi kantongmu hanya memiliki ${playerGold} G. Selesaikan patroli kerajaan untuk mendapatkan koin tambahan!`,
+                    "🪙"
+                );
+                return;
+            }
+
+            // Deduct Gold
+            playerGold -= total;
+            document.getElementById('player-gold').innerText = playerGold;
+            
+            // Replenish stamina visually
+            const staminaFill = document.getElementById('stamina-fill');
+            const staminaVal = document.getElementById('stamina-val');
+            staminaFill.style.width = '100%';
+            staminaVal.innerText = '100/100 (Kenyang)';
+
+            playRetroSound('buy');
+            
+            const purchasedCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            cart = [];
+            updateCartUI();
+            toggleBackpackModal();
+
+            showDialog(
+                "Pembelian Berhasil!", 
+                `Terima kasih Ksatria! Sebanyak ${purchasedCount} porsi santapan hangat kerajaan telah tersimpan aman di ranselmu. Energi tempurmu kini meningkat penuh! Selamat melanjutkan petualangan!`,
+                "🎉"
+            );
+        }
+
+        function claimDailyReward() {
+            playerGold += 100;
+            document.getElementById('player-gold').innerText = playerGold;
+            playRetroSound('coin');
+            showDialog("Hadiah Patroli Diterima!", "Komandan Benteng menyerahkan 100 Koin Emas sebagai upah patroli menjaga keamanan desa dari goblin!", "🛡️");
+        }
+
+        function showDialog(title, msg, avatar = "👨‍🍳") {
+            document.getElementById('dialog-title').innerText = title;
+            document.getElementById('dialog-message').innerText = msg;
+            document.getElementById('dialog-avatar').innerText = avatar;
+            document.getElementById('dialog-overlay').classList.remove('hidden');
+        }
+
+        function closeDialog() {
+            playRetroSound('click');
+            document.getElementById('dialog-overlay').classList.add('hidden');
+        }
+
+        const canvas = document.getElementById('fx-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function spawnSparkles(x, y) {
+            for (let i = 0; i < 16; i++) {
+                particles.push({
+                    x: x || window.innerWidth / 2,
+                    y: y || window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6 - 2,
+                    size: Math.floor(Math.random() * 4) + 3,
+                    color: Math.random() > 0.5 ? '#f59e0b' : '#fef08a',
+                    life: 1.0,
+                    decay: Math.random() * 0.03 + 0.02
+                });
+            }
+        }
+
+        function particleLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.15; // Gravity
+                p.life -= p.decay;
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life;
+                // Draw square pixel particle
+                ctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size, p.size);
+            }
+            ctx.globalAlpha = 1.0;
+            requestAnimationFrame(particleLoop);
+        }
+
+        window.onload = function() {
+            renderMenu();
+            updateCartUI();
+            particleLoop();
+
+            // Rotate Tavern Rumors every 12 seconds
+            const rumors = [
+                `"Ayam panggang madu kami baru saja keluar dari oven! Ksatria istana memuji rasanya yang mantap!"`,
+                `"Petualang dari gurun pasir memborong 10 Pai Daging pagi tadi!"`,
+                `"Bir jagung kami dijamin membuat suasana api unggun perkemahan makin meriah!"`,
+                `"Penyihir istana sering mencampurkan Teh Bunga Elven sebelum merapal mantra agung!"`
+            ];
+            let rumorIdx = 0;
+            setInterval(() => {
+                rumorIdx = (rumorIdx + 1) % rumors.length;
+                const rumorEl = document.getElementById('npc-text');
+                if (rumorEl) {
+                    rumorEl.innerText = rumors[rumorIdx];
+                }
+            }, 12000);
+        };
+    </script>
+</body>
+</html>

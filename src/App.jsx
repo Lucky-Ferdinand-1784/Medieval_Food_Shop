@@ -11,6 +11,7 @@ import CookingStation from './components/CookingStation';
 import QuestBoard from './components/QuestBoard';
 import BackpackDrawer from './components/BackpackDrawer';
 import DialogModal from './components/DialogModal';
+import TavernSignboard from './components/TavernSignboard';
 
 export default function App() {
   // Player RPG State
@@ -496,6 +497,13 @@ export default function App() {
       {/* Main Game Content Area */}
       <main className="main-content">
         
+        {/* Grand Medieval Wooden Tavern Hanging Signboard */}
+        <TavernSignboard
+          playerTitle={player.title}
+          playerLevel={player.level}
+          onSelectTitle={(newTitle) => setPlayer(prev => ({ ...prev, title: newTitle }))}
+        />
+
         {/* Interactive Wooden Tavern Background Stage */}
         <TavernScene
           currentView={currentView}

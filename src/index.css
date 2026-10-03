@@ -1158,3 +1158,207 @@ body {
   justify-content: space-between;
   gap: 12px;
 }
+
+/* ==========================================================================
+   TAVERN SIGNBOARD (GRAND MEDIEVAL TITLE BANNER)
+   ========================================================================== */
+.tavern-signboard-wrapper {
+  margin-bottom: 24px;
+  position: relative;
+  text-align: center;
+}
+
+.signboard-chains-row {
+  display: flex;
+  justify-content: space-between;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.hanging-chain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chain-link {
+  width: 10px;
+  height: 14px;
+  border: 3px solid #4a423a;
+  background: #201a15;
+  border-radius: 4px;
+  margin-top: -3px;
+  box-shadow: inset 1px 1px 0 #78716c;
+}
+
+.chain-ring {
+  width: 14px;
+  height: 14px;
+  border: 3px solid #854d19;
+  background: #2b180a;
+  border-radius: 50%;
+  margin-top: -2px;
+}
+
+.signboard-wood-panel {
+  background: #241105;
+  border: 5px solid #140702;
+  box-shadow: 
+    inset 4px 4px 0 #613314, 
+    inset -4px -4px 0 #0f0501,
+    0 8px 25px rgba(0, 0, 0, 0.85);
+  padding: 22px 24px 18px;
+  position: relative;
+  max-width: 860px;
+  margin: -6px auto 0;
+  background-image: 
+    linear-gradient(rgba(36, 17, 5, 0.94), rgba(28, 13, 4, 0.97)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='20' viewBox='0 0 80 20'%3E%3Cpath fill='%23120601' fill-opacity='0.18' d='M0 19h80v1H0z'/%3E%3C/svg%3E");
+}
+
+/* Iron Rivets at Corners */
+.iron-rivet {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #3e3832;
+  border: 2px solid #1c1815;
+  border-radius: 2px;
+  box-shadow: inset 1px 1px 0 #857d76, 1px 1px 0 #000;
+}
+.rivet-tl { top: 8px; left: 8px; }
+.rivet-tr { top: 8px; right: 8px; }
+.rivet-bl { bottom: 8px; left: 8px; }
+.rivet-br { bottom: 8px; right: 8px; }
+
+.signboard-top-tag {
+  display: inline-block;
+  background: #140702;
+  border: 1px solid #783d16;
+  padding: 4px 12px;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: #fbbf24;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.signboard-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 4px 0;
+}
+
+.signboard-flank-icon {
+  font-size: 28px;
+  filter: drop-shadow(2px 2px 0 #000);
+}
+
+.signboard-main-heading {
+  font-family: var(--font-pixel);
+  font-size: 26px;
+  color: #fbbf24;
+  letter-spacing: 1.5px;
+  text-shadow: 
+    3px 3px 0 #000,
+    -1px -1px 0 #78350f,
+    1px -1px 0 #78350f,
+    -1px 1px 0 #78350f,
+    0 0 16px rgba(245, 158, 11, 0.4);
+}
+
+@media (max-width: 640px) {
+  .signboard-main-heading {
+    font-size: 18px;
+  }
+}
+
+.signboard-sub-text {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: #fde68a;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.signboard-description {
+  font-family: var(--font-dialogue);
+  font-size: 18px;
+  color: #d6bfa8;
+  max-width: 720px;
+  margin: 10px auto 14px;
+  line-height: 1.35;
+}
+
+.signboard-badges-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.sign-badge-item {
+  background: #170903;
+  border: 2px solid #4a2810;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sub);
+  font-size: 10px;
+  color: #fef08a;
+  box-shadow: 1px 1px 0 #000;
+}
+
+.player-title-badge {
+  cursor: pointer;
+  border-color: #a855f7;
+  background: #2e103d;
+  color: #f0abfc;
+  transition: all 0.1s ease;
+}
+
+.player-title-badge:hover {
+  filter: brightness(1.2);
+  transform: translateY(-1px);
+}
+
+.title-picker-dropdown {
+  margin-top: 14px;
+  background: #160802;
+  border: 3px solid #783d16;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+  padding: 12px;
+  text-align: left;
+}
+
+.title-option-item {
+  background: #241105;
+  border: 1px solid #4a2810;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.08s ease;
+}
+
+.title-option-item:hover {
+  background: #3b1b0a;
+  border-color: #fbbf24;
+}
+
+.title-selected {
+  border-color: #fbbf24 !important;
+  background: #451f0b !important;
+}
+
+.title-locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
